@@ -1,26 +1,41 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  /* Paleta: #B3C7F8 #A3B16F #432548 */
+  --color-paper: #f6f7fd;   /* fondo: lavanda muy clara */
+  --color-ink: #1c2340;     /* texto: azul noche */
+  --color-muted: #5a6086;   /* texto secundario */
+  --color-line: #d9ddf3;    /* bordes */
+  --color-accent: #A3B16F;  /* verde: botón principal, fondo de la foto, foco */
+  --color-marker: #b3c7f8;  /* celeste: resaltado del título y recuadros */
+  --color-wine: #432548;    /* ciruela: línea de tiempo, skills, botón de enviar */
+  --font-display: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+  /* Tira del carrusel: la duración la calcula RecommendationsCarousel según el largo del texto */
+  --animate-slide-timer: slide-timer linear forwards;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  @keyframes slide-timer {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
   }
 }
 
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
 }
