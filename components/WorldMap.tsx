@@ -5,6 +5,9 @@ import { Star } from "@/components/CardBack";
 import OrgLogo from "@/components/OrgLogo";
 import { SectionTitle } from "@/components/Section";
 import type { Study } from "@/data/portfolio";
+import type { UI } from "@/data/ui";
+
+type T = UI["education"];
 
 // Educación como el mapa de mundos de un juego de plataformas: un camino punteado une cada estudio.
 // Lo terminado es un mundo superado (trofeo y 3 estrellas); lo que se está cursando es el checkpoint
@@ -17,7 +20,7 @@ const SEGMENTS = 10; // segmentos de la barra de energía
 // Sin caja: una línea punteada separa el contenido del mapa
 const panel = "border-t border-dashed border-glow/30 pt-8";
 
-export default function WorldMap({ studies }: { studies: Study[] }) {
+export default function WorldMap({ studies, t }: { studies: Study[]; t: T }) {
   // En orden de juego: primero lo superado, al final el checkpoint actual
   const worlds = [...studies].sort((a, b) => Number(!!a.current) - Number(!!b.current));
   const [selected, setSelected] = useState(worlds.findIndex((w) => w.current) === -1 ? 0 : worlds.findIndex((w) => w.current));
@@ -46,17 +49,15 @@ export default function WorldMap({ studies }: { studies: Study[] }) {
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <SectionTitle>
-          Educación · World map
-        </SectionTitle>
+        <SectionTitle>{t.title}</SectionTitle>
         <p className="rounded-full border border-glow/40 px-3 py-1 font-display text-xs font-semibold tabular-nums text-paper/80">
-          {done} / {worlds.length} mundos superados
+          {done} / {worlds.length} {t.cleared}
         </p>
       </div>
 
       {/* El mapa: inicio, un nodo por mundo y el próximo mundo bloqueado, unidos por el camino */}
-      <div className="mt-8 flex flex-col items-center md:flex-row md:items-start" role="tablist" aria-label="Mundos" onKeyDown={onKey}>
-        <Landmark label="Inicio">
+      <div className="mt-8 flex flex-col items-center md:flex-row md:items-start" role="tablist" aria-label={t.worlds} onKeyDown={onKey}>
+        <Landmark label={t.start}>
           <Flag className="size-6 text-paper/70" />
         </Landmark>
         {worlds.map((w, i) => (
@@ -68,6 +69,7 @@ export default function WorldMap({ studies }: { studies: Study[] }) {
               selected={i === selected}
               onSelect={() => setSelected(i)}
               onPick={() => pick(i)}
+              t={t}
               buttonRef={(el) => {
                 tabs.current[i] = el;
               }}
@@ -75,7 +77,7 @@ export default function WorldMap({ studies }: { studies: Study[] }) {
           </div>
         ))}
         <Path faded />
-        <Landmark label="Próximo mundo" locked>
+        <Landmark label={t.next} locked>
           <Lock className="size-5 text-paper/40" />
         </Landmark>
       </div>
@@ -91,7 +93,7 @@ export default function WorldMap({ studies }: { studies: Study[] }) {
             aria-labelledby={`world-tab-${i}`}
             className={`transition-opacity duration-300 md:[grid-area:1/1] ${i === selected ? "" : "max-md:hidden md:invisible md:opacity-0"}`}
           >
-            {w.current ? <LevelPath world={w} /> : <Loot world={w} />}
+            {w.current ? <LevelPath world={w} t={t} /> : <Loot world={w} t={t} />}
           </div>
         ))}
       </div>
@@ -111,6 +113,7 @@ function WorldNode({
   onSelect,
   onPick,
   buttonRef,
+  t,
 }: {
   world: Study;
   number: number;
@@ -118,6 +121,7 @@ function WorldNode({
   onSelect: () => void;
   onPick: () => void; // tocar o hacer clic (a diferencia de pasar el mouse)
   buttonRef: (el: HTMLButtonElement | null) => void;
+  t: T;
 }) {
   const cleared = !world.current;
   return (
@@ -142,7 +146,7 @@ function WorldNode({
           </span>
         ) : (
           <span className="rounded-full bg-glow px-2.5 py-0.5 font-display text-[10px] font-extrabold uppercase tracking-widest text-wine shadow-[0_0_12px_var(--color-glow)] motion-safe:animate-bounce">
-            Estás acá
+            {t.here}
           </span>
         )}
       </span>
@@ -170,21 +174,21 @@ function WorldNode({
       </span>
 
       <span className="mt-1 font-display text-[11px] font-bold uppercase tracking-[.2em]" style={{ color: cleared ? GOLD : "var(--color-glow)" }}>
-        Mundo {number} · {cleared ? "Superado" : "Checkpoint"}
+        {t.world} {number} · {cleared ? t.clearedTag : t.checkpoint}
       </span>
       <span className="font-display text-lg font-bold leading-tight text-balance text-paper">{world.title}</span>
       <span className="text-sm text-muted">{world.school}</span>
 
-      {!cleared && world.progress !== undefined && <Energy value={world.progress} />}
+      {!cleared && world.progress !== undefined && <Energy value={world.progress} label={t.progress} />}
     </button>
   );
 }
 
 // Barra de energía en segmentos, como la vida de un personaje
-function Energy({ value }: { value: number }) {
+function Energy({ value, label }: { value: number; label: string }) {
   const filled = Math.round(value * SEGMENTS);
   return (
-    <span className="mt-1 flex items-center gap-2" aria-label={`Avance: ${Math.round(value * 100)} %`}>
+    <span className="mt-1 flex items-center gap-2" aria-label={`${label}: ${Math.round(value * 100)} %`}>
       <span className="flex gap-0.5 rounded-md border border-glow/50 bg-black/30 p-0.5" aria-hidden>
         {Array.from({ length: SEGMENTS }, (_, i) => (
           <span key={i} className={`h-2.5 w-2.5 rounded-[2px] ${i < filled ? "bg-glow shadow-[0_0_6px_var(--color-glow)]" : "bg-white/10"}`} />
@@ -241,10 +245,10 @@ function PanelHeader({ world, kicker, color }: { world: Study; kicker: string; c
 }
 
 // Mundo superado: lo aprendido como inventario de loot
-function Loot({ world }: { world: Study }) {
+function Loot({ world, t }: { world: Study; t: T }) {
   return (
     <div className={panel}>
-      <PanelHeader world={world} kicker={`Inventario de loot · ${world.contents.length} ítems`} color={GOLD} />
+      <PanelHeader world={world} kicker={`${t.loot} · ${world.contents.length} ${t.items}`} color={GOLD} />
       <ul className="mt-5 grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
         {world.contents.map((c) => (
           <li key={c} className="flex items-center gap-3 rounded-xl border border-[#f3c969]/25 bg-[#f3c969]/[.04] p-2 pr-3 text-sm text-paper/90">
@@ -260,10 +264,10 @@ function Loot({ world }: { world: Study }) {
 }
 
 // Checkpoint actual: las materias como monedas sobre el camino del nivel
-function LevelPath({ world }: { world: Study }) {
+function LevelPath({ world, t }: { world: Study; t: T }) {
   return (
     <div className={panel}>
-      <PanelHeader world={world} kicker={`Camino del nivel · ${world.contentsLabel}`} color="var(--color-glow)" />
+      <PanelHeader world={world} kicker={`${t.levelPath} · ${world.contentsLabel}`} color="var(--color-glow)" />
       <ol className="relative mt-6 flex flex-col gap-4 lg:flex-row lg:gap-2">
         {/* Celular: una línea punteada vertical que une las monedas */}
         <span className="absolute bottom-4 left-[1.125rem] top-4 border-l-2 border-dashed border-glow/50 lg:hidden" aria-hidden />

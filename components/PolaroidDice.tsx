@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 import CardBack from "@/components/CardBack";
 import Die3D, { type Die3DHandle } from "@/components/Die3D";
 import ChestIcon from "@/components/ChestIcon";
+import type { UI } from "@/data/ui";
 
 // Cada número del dado es una carta (todas con foto horizontal) y tiene su tesoro.
 export type DiceCard = { src: string; alt: string; title?: string; caption: string };
@@ -23,7 +24,7 @@ const TOSS: Keyframe[] = [
 const cardSize = "w-full max-w-md";
 const frame = "rounded-xl bg-white p-3 pb-4 text-ink";
 
-export default function PolaroidDice({ cards }: { cards: DiceCard[] }) {
+export default function PolaroidDice({ cards, t }: { cards: DiceCard[]; t: UI["dice"] }) {
   const die = useRef<Die3DHandle>(null);
   const tossRef = useRef<HTMLDivElement>(null);
   const [shown, setShown] = useState(-1); // índice de la carta a la vista
@@ -45,12 +46,12 @@ export default function PolaroidDice({ cards }: { cards: DiceCard[] }) {
     if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       tossRef.current?.animate(TOSS, { duration: 1500, easing: "ease-out" });
     }
-    setStatus("Tirando…");
+    setStatus(t.rolling);
     await die.current?.roll(n);
     setRolling(false);
     show(n - 1);
     setFound((f) => (f.includes(n - 1) ? f : [...f, n - 1]));
-    setStatus(`Sacaste un ${n}.`);
+    setStatus(`${t.rolled} ${n}.`);
   };
 
   const card = shown >= 0 && !rolling ? cards[shown] : null;
@@ -63,7 +64,7 @@ export default function PolaroidDice({ cards }: { cards: DiceCard[] }) {
           type="button"
           onClick={roll}
           aria-disabled={rolling}
-          aria-label="Tirar el dado"
+          aria-label={t.roll}
           className="group relative size-44 cursor-pointer rounded-full aria-disabled:cursor-wait"
         >
           <span className="absolute inset-x-6 bottom-1 h-5 rounded-full bg-black/40 blur-md" aria-hidden />
@@ -71,7 +72,7 @@ export default function PolaroidDice({ cards }: { cards: DiceCard[] }) {
             <Die3D ref={die} className="size-full drop-shadow-[0_0_18px_var(--color-glow)]" />
           </span>
         </button>
-        <p className="font-display text-sm font-bold text-glow">{shown < 0 ? "Tocá el dado para tirarlo" : "Tocá el dado para tirar de nuevo"}</p>
+        <p className="font-display text-sm font-bold text-glow">{shown < 0 ? t.tapFirst : t.tapAgain}</p>
         <p className="h-5 text-sm text-muted" aria-live="polite">
           {status}
         </p>
@@ -116,9 +117,9 @@ export default function PolaroidDice({ cards }: { cards: DiceCard[] }) {
                     type="button"
                     disabled={rolling}
                     onClick={() => show(i)}
-                    aria-label={`${i + 1}: Cofre ${seen ? "" : " (todavía no salió en el dado)"}`}
+                    aria-label={`${i + 1}: ${t.chest}${seen ? "" : ` ${t.notYet}`}`}
                     aria-current={current ? "true" : undefined}
-                    title={`${i + 1} · Cofre`}
+                    title={`${i + 1} · ${t.chest}`}
                     className={`relative grid size-10 place-items-center rounded-xl border-2 transition hover:-translate-y-0.5 disabled:hover:translate-y-0 ${
                       current
                         ? "border-glow bg-glow text-wine shadow-[0_0_16px_var(--color-glow)]"

@@ -5,12 +5,12 @@ import { profile } from "@/data/portfolio";
 
 // Imagen para compartir el link (LinkedIn, WhatsApp, Slack…): cielo de estrellas como el sitio,
 // la foto en una carta con borde rosa y el nombre con el rol. Se genera en el build.
+// La usan app/(es)/opengraph-image.tsx y app/(en)/en/opengraph-image.tsx (nombre, rol y stack son iguales en los dos idiomas).
 // ✏️ Los textos salen de data/portfolio.ts; las tecnologías de abajo se editan acá.
 const STACK = ["React", "Next.js", "TypeScript", "Tailwind CSS"];
 
-export const alt = `${profile.name} · ${profile.role}`;
-export const size = { width: 1200, height: 630 };
-export const contentType = "image/png";
+export const ogAlt = `${profile.name} · ${profile.role}`;
+export const ogSize = { width: 1200, height: 630 };
 
 // Archivos que no dependen del pedido: se leen una sola vez
 const [photo, semibold, extrabold] = await Promise.all([
@@ -39,7 +39,7 @@ function Sparkle({ x, y, s, color }: { x: number; y: number; s: number; color: s
   );
 }
 
-export default function Image() {
+export function renderOgImage() {
   return new ImageResponse(
     (
       <div
@@ -119,7 +119,7 @@ export default function Image() {
       </div>
     ),
     {
-      ...size,
+      ...ogSize,
       fonts: [
         { name: "Montserrat", data: semibold, weight: 600, style: "normal" },
         { name: "Montserrat", data: extrabold, weight: 800, style: "normal" },

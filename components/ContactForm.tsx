@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { Star } from "@/components/CardBack";
+import type { UI } from "@/data/ui";
 
 // El contrato de misión: quien me recluta completa los parámetros y "despliega" la misión.
 type Status = "idle" | "sending" | "sent" | "error";
@@ -52,7 +53,7 @@ const BURST = Array.from({ length: 12 }, (_, i) => {
   return { x: Math.round(Math.cos(angle) * dist), y: Math.round(Math.sin(angle) * dist), delay: (i % 4) * 60 };
 });
 
-export default function ContactForm({ email }: { email: string }) {
+export default function ContactForm({ email, t }: { email: string; t: UI["contact"] }) {
   const [status, setStatus] = useState<Status>("idle");
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -60,7 +61,7 @@ export default function ContactForm({ email }: { email: string }) {
     const form = event.currentTarget;
     const data = new FormData(form);
     data.append("access_key", process.env.NEXT_PUBLIC_WEB3FORMS_KEY ?? "");
-    data.append("subject", "Nuevo encargo desde tu portfolio");
+    data.append("subject", t.subject);
 
     setStatus("sending");
     try {
@@ -89,10 +90,10 @@ export default function ContactForm({ email }: { email: string }) {
 
         {/* Cabecera del contrato */}
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-dashed border-glow/30 px-10 py-5">
-          <p className="font-display text-sm font-extrabold uppercase tracking-[.2em] text-paper">Contrato de misión</p>
+          <p className="font-display text-sm font-extrabold uppercase tracking-[.2em] text-paper">{t.contract}</p>
           <p className="flex items-center gap-2 rounded-full border border-accent/50 px-3 py-1 font-display text-[11px] font-bold uppercase tracking-wider text-accent">
             <span className="size-1.5 rounded-full bg-accent" aria-hidden />
-            {status === "sent" ? "Misión aceptada" : "Vacante abierta"}
+            {status === "sent" ? t.accepted : t.open}
           </p>
         </div>
 
@@ -108,45 +109,45 @@ export default function ContactForm({ email }: { email: string }) {
               ))}
             </div>
             <div className="relative">
-              <p className="font-display text-sm font-bold uppercase tracking-[.3em] text-accent">Señal recibida</p>
+              <p className="font-display text-sm font-bold uppercase tracking-[.3em] text-accent">{t.received}</p>
               <p className="mt-2 font-display text-3xl font-extrabold text-paper drop-shadow-[0_0_14px_var(--color-glow)] md:text-4xl">
-                ¡Misión desplegada!
+                {t.deployed}
               </p>
-              <p className="mx-auto mt-4 max-w-xs text-paper/80">Recibí tu encargo y te respondo lo antes posible.</p>
+              <p className="mx-auto mt-4 max-w-xs text-paper/80">{t.thanks}</p>
               <button
                 type="button"
                 onClick={() => setStatus("idle")}
                 className="mt-8 font-display text-sm font-bold uppercase tracking-wider text-glow underline decoration-2 underline-offset-4"
               >
-                Publicar otro encargo
+                {t.another}
               </button>
             </div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6 px-6 py-8 md:px-10 md:py-10">
             <div className="grid gap-6 md:grid-cols-2">
-              <Field id="contact-name" label="Emisor / Reclutador" hint="Quién encarga">
-                <input id="contact-name" name="name" type="text" required autoComplete="name" placeholder="Guild Master / Tu nombre" className={fieldClass} />
+              <Field id="contact-name" label={t.nameLabel} hint={t.nameHint}>
+                <input id="contact-name" name="name" type="text" required autoComplete="name" placeholder={t.namePlaceholder} className={fieldClass} />
               </Field>
-              <Field id="contact-email" label="Canal de respuesta" hint="Tu email">
+              <Field id="contact-email" label={t.emailLabel} hint={t.emailHint}>
                 <input
                   id="contact-email"
                   name="email"
                   type="email"
                   required
                   autoComplete="email"
-                  placeholder="canal_de_contacto@realm.com"
+                  placeholder={t.emailPlaceholder}
                   className={fieldClass}
                 />
               </Field>
             </div>
-            <Field id="contact-message" label="Detalles de la misión" hint="Propuesta, proyecto o saludo">
+            <Field id="contact-message" label={t.messageLabel} hint={t.messageHint}>
               <textarea
                 id="contact-message"
                 name="message"
                 required
                 rows={6}
-                placeholder="Describí la propuesta, proyecto o saludo..."
+                placeholder={t.messagePlaceholder}
                 className={`${fieldClass} min-h-40 resize-y`}
               />
             </Field>
@@ -156,7 +157,7 @@ export default function ContactForm({ email }: { email: string }) {
 
             <div className="flex flex-col-reverse items-stretch gap-4 border-t border-dashed border-glow/25 pt-6 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-xs text-paper/50">
-                <span className="text-glow">*</span> Parámetros obligatorios del contrato
+                <span className="text-glow">*</span> {t.required}
               </p>
               <button
                 type="submit"
@@ -166,15 +167,14 @@ export default function ContactForm({ email }: { email: string }) {
                 <ScrollSignal
                   className={`size-5 text-glow transition-transform duration-300 group-hover:rotate-[-8deg] ${status === "sending" ? "motion-safe:animate-pulse" : ""}`}
                 />
-                {status === "sending" ? "Transmitiendo señal…" : "Aceptar encargo y enviar"}
+                {status === "sending" ? t.sending : t.send}
               </button>
             </div>
 
             <div aria-live="polite" className="text-sm empty:hidden">
               {status === "error" && (
                 <p className="rounded-lg border border-glow/40 bg-glow/10 px-4 py-3">
-                  <span className="font-display font-bold uppercase tracking-wider text-glow">Señal perdida.</span> No se pudo enviar el encargo. Probá de
-                  nuevo o escribime a{" "}
+                  <span className="font-display font-bold uppercase tracking-wider text-glow">{t.errorTitle}</span> {t.errorText}{" "}
                   <a href={`mailto:${email}`} className="font-semibold underline underline-offset-2">
                     {email}
                   </a>

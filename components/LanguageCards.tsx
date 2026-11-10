@@ -1,6 +1,9 @@
 import { Star } from "@/components/CardBack";
 import { SectionTitle } from "@/components/Section";
 import type { Language } from "@/data/portfolio";
+import type { UI } from "@/data/ui";
+
+type T = UI["languages"];
 
 // Idiomas como cartas coleccionables (TCG), con la misma cara que las cartas de "Sobre mí":
 // borde con degradé rosa, fondo ciruela y estrellitas. La carta certificada lleva acabado
@@ -8,22 +11,20 @@ import type { Language } from "@/data/portfolio";
 
 const GOLD = "#f3c969";
 
-export default function LanguageCards({ languages }: { languages: Language[] }) {
+export default function LanguageCards({ languages, t }: { languages: Language[]; t: T }) {
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <SectionTitle>
-          Idiomas · Colección
-        </SectionTitle>
+        <SectionTitle>{t.title}</SectionTitle>
         <p className="rounded-full border border-glow/40 px-3 py-1 font-display text-xs font-semibold tabular-nums text-paper/80">
-          {languages.length} / {languages.length} cartas
+          {languages.length} / {languages.length} {t.cards}
         </p>
       </div>
 
       <ul className="mt-8 flex flex-wrap justify-center gap-8 md:gap-12">
         {languages.map((l) => (
           <li key={l.code} className="w-full max-w-[19rem]">
-            <LanguageCard lang={l} />
+            <LanguageCard lang={l} t={t} />
           </li>
         ))}
       </ul>
@@ -31,7 +32,7 @@ export default function LanguageCards({ languages }: { languages: Language[] }) 
   );
 }
 
-function LanguageCard({ lang }: { lang: Language }) {
+function LanguageCard({ lang, t }: { lang: Language; t: T }) {
   const foil = !!lang.cert;
   return (
     <article
@@ -74,14 +75,14 @@ function LanguageCard({ lang }: { lang: Language }) {
           {lang.cert && (
             <span className="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider" style={{ borderColor: GOLD, color: GOLD }}>
               <Seal className="size-3.5" />
-              Certificada
+              {t.certified}
             </span>
           )}
         </div>
 
         {/* Línea de tipo: la rareza */}
         <p className="mt-3 flex items-center justify-between gap-2 border-y border-glow/25 py-1.5 text-[11px] font-bold uppercase tracking-wider">
-          <span className="text-paper/60">Rareza</span>
+          <span className="text-paper/60">{t.rarity}</span>
           <span className={foil ? "text-marker" : "text-glow"}>{lang.rarity}</span>
         </p>
 
@@ -90,7 +91,7 @@ function LanguageCard({ lang }: { lang: Language }) {
 
         {/* Pie: nivel y certificación */}
         <p className="mt-auto flex items-end justify-between gap-2 pt-3 text-[11px]">
-          <span className="text-paper/55">{lang.cert ?? "Lengua materna"}</span>
+          <span className="text-paper/55">{lang.cert ?? t.native}</span>
           <span className="shrink-0 font-display text-sm font-extrabold text-white">{lang.level}</span>
         </p>
       </div>

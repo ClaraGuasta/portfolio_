@@ -2,20 +2,20 @@
 
 import { useEffect, useState } from "react";
 import CardBack, { Star } from "@/components/CardBack";
+import type { UI } from "@/data/ui";
 
 // Los botones del inicio son cartas del tamaño de un botón: aparecen boca abajo y se dan vuelta
 // solas cuando las cartas grandes terminan de entrar (≈1,6 s después de que carga la página).
 const REVEAL_MS = 1600;
 
-const ctas = [
-  { label: "Contactame", external: false },
-  { label: "Descargar CV", external: true },
-];
-
 const face = "rounded-lg border backface-hidden";
 
-export default function HeroCta({ cvUrl }: { cvUrl: string }) {
+export default function HeroCta({ cvUrl, t }: { cvUrl: string; t: UI["hero"] }) {
   const [revealed, setRevealed] = useState(false);
+  const ctas = [
+    { label: t.contact, external: false },
+    { label: t.cv, external: true },
+  ];
 
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;

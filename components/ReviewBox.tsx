@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import type { Recommendation } from "@/data/portfolio";
 import { titleClass } from "@/components/Section";
+import type { UI } from "@/data/ui";
 
 // Dorso de la caja de un juego de mesa: cada recomendación es una reseña con su frase destacada.
 // "Leer reseña completa" abre el texto entero en una carta.
@@ -14,7 +15,7 @@ const Stars = ({ className = "" }: { className?: string }) => (
   </span>
 );
 
-export default function ReviewBox({ items, linkedin }: { items: Recommendation[]; linkedin: string }) {
+export default function ReviewBox({ items, linkedin, t }: { items: Recommendation[]; linkedin: string; t: UI["reviews"] }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [open, setOpen] = useState(0);
   const r = items[open];
@@ -29,7 +30,7 @@ export default function ReviewBox({ items, linkedin }: { items: Recommendation[]
       {/* Título de la sección (con estrellitas de reseña a los costados) */}
       <h2 className={`${titleClass} flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center`}>
         <Stars />
-        Lo que dicen quienes ya jugaron en mi equipo
+        {t.title}
         <Stars className="max-sm:hidden" />
       </h2>
 
@@ -55,20 +56,22 @@ export default function ReviewBox({ items, linkedin }: { items: Recommendation[]
               onClick={() => show(i)}
               className="mt-auto self-start pt-4 text-sm font-bold text-wine underline decoration-glow decoration-2 underline-offset-4 hover:decoration-wine"
             >
-              Leer reseña completa
+              {t.readMore}
             </button>
           </li>
         ))}
       </ul>
 
-      <p className="mt-5 text-center text-sm">
+      {t.translated && <p className="mt-6 text-center text-xs italic text-paper/60">{t.translated}</p>}
+
+      <p className={`${t.translated ? "mt-2" : "mt-5"} text-center text-sm`}>
         <a
           href={linkedin}
           target="_blank"
           rel="noopener noreferrer"
           className="font-semibold"
         >
-          Ver las recomendaciones en LinkedIn
+          {t.linkedin}
         </a>
       </p>
 
@@ -84,13 +87,13 @@ export default function ReviewBox({ items, linkedin }: { items: Recommendation[]
             type="button"
             onClick={() => dialog.current?.close()}
             className="float-right -mr-2 -mt-2 ml-3 flex size-9 items-center justify-center rounded-full border border-glow/60 text-lg hover:bg-glow/20"
-            aria-label="Cerrar"
+            aria-label={t.close}
           >
             ×
           </button>
           <Stars className="text-lg text-glow" />
           <h3 id="review-title" className="mt-1 font-display text-xl font-bold">
-            Reseña de {r.name}
+            {t.reviewBy} {r.name}
           </h3>
           <p className="text-sm text-paper/75">
             {r.role} · {r.relation}
@@ -101,6 +104,12 @@ export default function ReviewBox({ items, linkedin }: { items: Recommendation[]
               <p key={p}>{p}</p>
             ))}
           </blockquote>
+          {/* Versión en inglés: aviso de que la cita es una traducción del original */}
+          {t.translated && (
+            <p className="mt-5 border-t border-glow/25 pt-3 text-xs italic text-paper/60">
+              {t.translated}
+            </p>
+          )}
         </div>
       </dialog>
     </div>

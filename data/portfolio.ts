@@ -1,4 +1,5 @@
-// ✏️ Todo el contenido del portfolio vive acá.
+// ✏️ Todo el contenido del portfolio vive acá (versión en español).
+// La versión en inglés está en data/portfolio.en.ts: si cambiás algo acá, actualizalo también allá.
 
 export const profile = {
   name: "Clara Matilde Guastavino",
@@ -25,7 +26,7 @@ export type ProfileCard = { title: string; text: string; pinned?: boolean }; // 
 // Cartas del inicio: datos cortos y visuales (el detalle está en las secciones de abajo y en LinkedIn).
 // Es un mazo: en cada mezcla salen las cartas fijas (pinned) y el comodín con la foto, y el resto se completa al azar.
 // Los años se calculan desde el primer trabajo (mayo de 2022), así que se actualizan solos en cada build.
-const yearsCoding = Math.floor((Date.now() - new Date(2022, 4, 1).getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+export const yearsCoding = Math.floor((Date.now() - new Date(2022, 4, 1).getTime()) / (365.25 * 24 * 60 * 60 * 1000));
 
 export const heroFacts: ProfileCard[] = [
   { title: `+${yearsCoding} años`, text: "de experiencia en desarrollo frontend", pinned: true },
@@ -40,7 +41,7 @@ export const heroFacts: ProfileCard[] = [
 // `zoom` recorta el margen de la imagen para que el logo se lea en tamaño chico.
 export type Logo = { src: string; zoom: number };
 
-const logos = {
+export const logos = {
   itti: { src: "/logo-itti.jpg", zoom: 1.7 },
   digitalHouse: { src: "/logo-dh.jpg", zoom: 2 },
   palermo: { src: "/logo-up.jpg", zoom: 1 },

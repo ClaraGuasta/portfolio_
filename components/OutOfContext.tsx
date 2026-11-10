@@ -1,11 +1,19 @@
-import PolaroidDice from "@/components/PolaroidDice";
+import PolaroidDice, { type DiceCard } from "@/components/PolaroidDice";
 import { DIE_FACES } from "@/components/dieFaces";
-import { personal, outOfContext } from "@/data/portfolio";
 import { SectionTitle, sectionWidth } from "@/components/Section";
+import type { UI } from "@/data/ui";
 
-export default function OutOfContext() {
-  if (outOfContext.length !== DIE_FACES) {
-    throw new Error(`El dado tiene ${DIE_FACES} caras y hay ${outOfContext.length} cartas en Out of Context: tienen que coincidir.`);
+export default function OutOfContext({
+  personal,
+  cards,
+  t,
+}: {
+  personal: { title: string; intro: string };
+  cards: DiceCard[];
+  t: UI["dice"];
+}) {
+  if (cards.length !== DIE_FACES) {
+    throw new Error(`El dado tiene ${DIE_FACES} caras y hay ${cards.length} cartas en Out of Context: tienen que coincidir.`);
   }
 
   return (
@@ -13,7 +21,7 @@ export default function OutOfContext() {
       <SectionTitle>{personal.title}</SectionTitle>
       <p className="mt-4 text-lg text-muted">{personal.intro}</p>
 
-      <PolaroidDice cards={outOfContext} />
+      <PolaroidDice cards={cards} t={t} />
     </section>
   );
 }

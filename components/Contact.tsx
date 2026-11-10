@@ -1,13 +1,15 @@
 import ContactForm from "@/components/ContactForm";
 import { Star } from "@/components/CardBack";
-import { profile } from "@/data/portfolio";
+import { sectionWidth } from "@/components/Section";
+import type { profile as Profile } from "@/data/portfolio";
+import type { UI } from "@/data/ui";
 
 // Contacto como un tablero de encargos (RPG): a un lado los canales oficiales,
 // al otro el contrato de misión que completa quien me quiere reclutar.
 
-const channels = [
+const channelsOf = (profile: typeof Profile, t: UI["contact"]) => [
   {
-    label: "Correo directo",
+    label: t.email,
     handle: profile.email,
     href: `mailto:${profile.email}`,
     external: false,
@@ -29,20 +31,21 @@ const channels = [
   },
 ];
 
-export default function Contact() {
+export default function Contact({ profile, t }: { profile: typeof Profile; t: UI["contact"] }) {
+  const channels = channelsOf(profile, t);
   return (
-    <section id="contacto" className="mx-auto max-w-6xl px-4 py-16 md:px-6 md:py-24">
+    <section id="contacto" className={`${sectionWidth} py-16 md:py-24`}>
       {/* Encabezado del tablero */}
       <header className="max-w-2xl">
         <p className="flex items-center gap-2 font-display text-xs font-bold uppercase tracking-[.3em] text-marker">
           <Star className="size-2.5 text-glow" />
-          New quest board
+          {t.kicker}
         </p>
         <h2 className="mt-3 font-display text-2xl font-extrabold uppercase tracking-[.08em] text-glow drop-shadow-[0_0_10px_var(--color-glow)] md:text-4xl">
-          Tablero de encargos
+          {t.title}
         </h2>
         <p className="mt-4 text-lg text-paper/80">
-          ¿Tenés una misión, propuesta o consulta? Completá los parámetros del contrato para enviar la señal.
+          {t.intro}
         </p>
       </header>
 
@@ -53,7 +56,7 @@ export default function Contact() {
             id="canales-oficiales"
             className="flex items-center gap-3 font-display text-xs font-bold uppercase tracking-[.2em] text-paper/70 after:h-px after:flex-1 after:bg-linear-to-r after:from-glow/40 after:to-transparent"
           >
-            Canales oficiales
+            {t.channels}
           </h3>
           <ul className="mt-4 grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
             {channels.map((c) => (
@@ -80,23 +83,23 @@ export default function Contact() {
           {/* Estado de la aventurera, al estilo de una ficha de reclutamiento. ✏️ ajustá estos datos a tu realidad */}
           <dl className="mt-6 hidden space-y-2.5 rounded-xl border border-dashed border-glow/25 p-4 text-sm lg:block">
             <div className="flex justify-between gap-3">
-              <dt className="text-paper/60">Estado</dt>
+              <dt className="text-paper/60">{t.status}</dt>
               <dd className="flex items-center gap-2 font-semibold text-accent">
                 <span className="relative flex size-2">
                   <span className="absolute inset-0 rounded-full bg-accent motion-safe:animate-ping" />
                   <span className="relative size-2 rounded-full bg-accent" />
                 </span>
-                Disponible para misiones
+                {t.available}
               </dd>
             </div>
             <div className="flex justify-between gap-3">
-              <dt className="text-paper/60">Tiempo de respuesta</dt>
-              <dd className="font-semibold text-paper">~ 24 hs</dd>
+              <dt className="text-paper/60">{t.responseTime}</dt>
+              <dd className="font-semibold text-paper">{t.responseValue}</dd>
             </div>
           </dl>
         </aside>
 
-        <ContactForm email={profile.email} />
+        <ContactForm email={profile.email} t={t} />
       </div>
     </section>
   );

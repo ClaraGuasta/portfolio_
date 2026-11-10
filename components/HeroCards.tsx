@@ -4,6 +4,7 @@ import { useState, useSyncExternalStore } from "react";
 import CardBack from "@/components/CardBack";
 import { faceClass, FactFace, JokerFace } from "@/components/CardFaces";
 import type { ProfileCard } from "@/data/portfolio";
+import type { UI } from "@/data/ui";
 
 const HAND = 4; // cartas del mazo por mano (las fijas incluidas); el comodín se suma siempre
 const JOKER = -1;
@@ -50,7 +51,7 @@ function subscribe(l: () => void) {
   return () => listeners.delete(l);
 }
 
-export default function HeroCards({ facts, photo, name }: { facts: ProfileCard[]; photo: string; name: string }) {
+export default function HeroCards({ facts, photo, name, t }: { facts: ProfileCard[]; photo: string; name: string; t: UI["hero"] }) {
   const hand = useSyncExternalStore(subscribe, () => getDeal(facts), () => null);
   const [flipped, setFlipped] = useState<Record<string, boolean>>({});
   const [leaving, setLeaving] = useState(false);
@@ -79,7 +80,7 @@ export default function HeroCards({ facts, photo, name }: { facts: ProfileCard[]
         >
           {(hand ? cards : [0, 1, 2, 3, JOKER]).map((cardIndex, i) => {
             const card = cardIndex === JOKER ? null : facts[cardIndex];
-            const title = card ? card.title : "Comodín";
+            const title = card ? card.title : t.joker;
             const isFlipped = !!flipped[title];
 
             return (
@@ -100,7 +101,7 @@ export default function HeroCards({ facts, photo, name }: { facts: ProfileCard[]
                       className="relative size-full transform-3d motion-safe:transition-transform motion-safe:duration-700 motion-safe:ease-[cubic-bezier(.3,1.4,.5,1)]"
                       style={{ transform: isFlipped ? "rotateY(0deg)" : "rotateY(180deg)" }}
                     >
-                      {card ? <FactFace card={card} /> : <JokerFace photo={photo} name={name} />}
+                      {card ? <FactFace card={card} /> : <JokerFace photo={photo} name={name} photoOf={t.photoOf} />}
                       <div className={`${faceClass} rotate-y-180 shadow-[0_0_40px_6px_var(--color-glow)]`}>
                         <CardBack ratio={CARD_RATIO} />
                       </div>
@@ -110,7 +111,7 @@ export default function HeroCards({ facts, photo, name }: { facts: ProfileCard[]
                 <button
                   type="button"
                   aria-pressed={isFlipped}
-                  aria-label={`Dar vuelta la carta: ${title}`}
+                  aria-label={`${t.flip}: ${title}`}
                   className="absolute inset-0 cursor-pointer rounded-2xl"
                   onClick={() => setFlipped({ ...flipped, [title]: !isFlipped })}
                 />
@@ -139,7 +140,7 @@ export default function HeroCards({ facts, photo, name }: { facts: ProfileCard[]
           >
             <path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5" />
           </svg>
-          Volver a mezclar
+          {t.reshuffle}
         </button>
       </div>
     </>

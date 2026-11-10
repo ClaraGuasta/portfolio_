@@ -4,6 +4,9 @@ import { useEffect, useId, useRef, useState } from "react";
 import OrgLogo from "@/components/OrgLogo";
 import { Star } from "@/components/CardBack";
 import type { Job, Project } from "@/data/portfolio";
+import type { UI } from "@/data/ui";
+
+type T = UI["experience"];
 
 // La experiencia como recorrido de juego de mesa: un camino ancho que serpentea hacia abajo,
 // con una casilla grande por paso (inicio, cada trabajo seguido de sus proyectos y la que falta escribir).
@@ -14,17 +17,17 @@ type Square =
   | { kind: "project"; title: string; sub: string; project: Project; job: Job }
   | { kind: "goal"; title: string; sub: string };
 
-function buildSquares(jobs: Job[]): Square[] {
+function buildSquares(jobs: Job[], t: T): Square[] {
   const chronological = [...jobs].reverse();
   const first = chronological[0];
-  const squares: Square[] = [{ kind: "start", title: "Inicio", sub: first.period.split(" – ")[0], firstJob: first }];
+  const squares: Square[] = [{ kind: "start", title: t.start, sub: first.period.split(" – ")[0], firstJob: first }];
   for (const job of chronological) {
     squares.push({ kind: "job", title: job.company, sub: job.role, job });
     for (const project of job.projects ?? []) {
-      squares.push({ kind: "project", title: project.short ?? project.name, sub: `Proyecto · ${job.company}`, project, job });
+      squares.push({ kind: "project", title: project.short ?? project.name, sub: `${t.project} · ${job.company}`, project, job });
     }
   }
-  squares.push({ kind: "goal", title: "Tu equipo", sub: "¿Próxima casilla?" });
+  squares.push({ kind: "goal", title: t.goalTitle, sub: t.goalSub });
   return squares;
 }
 
@@ -126,6 +129,7 @@ function Board({
   onSelect,
   className,
   labelClass,
+  label,
 }: {
   geo: ReturnType<typeof geometry>;
   squares: Square[];
@@ -134,6 +138,7 @@ function Board({
   onSelect: (i: number) => void;
   className: string;
   labelClass: string;
+  label: string;
 }) {
   const pct = (p: { x: number; y: number }) => ({ left: `${(p.x / geo.W) * 100}%`, top: `${(p.y / geo.H) * 100}%` });
   // La ficha sigue el camino y se para a la derecha del texto de su casilla (--pawn-x).
@@ -166,7 +171,7 @@ function Board({
               type="button"
               onClick={() => onSelect(i)}
               aria-current={i === selected ? "step" : undefined}
-              aria-label={`Casilla ${i + 1}: ${s.title} · ${s.sub}`}
+              aria-label={`${label} ${i + 1}: ${s.title} · ${s.sub}`}
               className={`group flex flex-col items-center justify-center rounded-2xl text-center text-ink ${labelClass}`}
             >
               <span
@@ -191,11 +196,11 @@ function Board({
 
 const chip = "rounded-full border border-glow/60 px-3 py-1 text-sm font-medium";
 
-function Detail({ square, index, squares, onGo }: { square: Square; index: number; squares: Square[]; onGo: (i: number) => void }) {
+function Detail({ square, index, squares, onGo, t }: { square: Square; index: number; squares: Square[]; onGo: (i: number) => void; t: T }) {
   const eyebrow = (
     <p className="flex items-center gap-1.5 text-sm font-semibold text-glow">
       <Star className="size-3" />
-      Casilla {index + 1}
+      {t.square} {index + 1}
     </p>
   );
 
@@ -203,10 +208,8 @@ function Detail({ square, index, squares, onGo }: { square: Square; index: numbe
     return (
       <>
         {eyebrow}
-        <h3 className="mt-1 font-display text-2xl font-extrabold">Inicio · {square.sub}</h3>
-        <p className="mt-3">
-          Acá arranca el recorrido. Cuando decidí que quería dedicarme a desarrollar interfaces intuitivas y accesibles, páginas web que la gente disfrute usar. 
-        </p>
+        <h3 className="mt-1 font-display text-2xl font-extrabold">{t.start} · {square.sub}</h3>
+        <p className="mt-3">{t.startText}</p>
       </>
     );
   }
@@ -215,10 +218,10 @@ function Detail({ square, index, squares, onGo }: { square: Square; index: numbe
     return (
       <>
         {eyebrow}
-        <h3 className="mt-1 font-display text-2xl font-extrabold">¿La próxima casilla?</h3>
-        <p className="mt-3">Todavía no está escrita. Si tu equipo busca una desarrolladora frontend, hablemos.</p>
+        <h3 className="mt-1 font-display text-2xl font-extrabold">{t.goalHeading}</h3>
+        <p className="mt-3">{t.goalText}</p>
         <a href="#contacto" className="mt-5 inline-block rounded-full bg-glow px-6 py-3 font-semibold text-ink hover:opacity-90">
-          Contactame
+          {t.goalCta}
         </a>
       </>
     );
@@ -231,7 +234,7 @@ function Detail({ square, index, squares, onGo }: { square: Square; index: numbe
         {eyebrow}
         <p className="mt-1 flex items-center gap-2 text-sm text-muted">
           <OrgLogo logo={job.logo} />
-          Proyecto en {job.company}
+          {t.projectAt} {job.company}
         </p>
         <h3 className="mt-2 font-display text-2xl font-extrabold">{project.name}</h3>
         <ul className="mt-4 list-disc space-y-1.5 pl-5">
@@ -272,7 +275,7 @@ function Detail({ square, index, squares, onGo }: { square: Square; index: numbe
           {projectSquares.map(({ s, i }) => (
             <li key={s.title}>
               <button type="button" onClick={() => onGo(i)} className="rounded-xl border border-glow/60 bg-white/5 px-4 py-2 text-left text-sm font-semibold hover:bg-glow/20">
-                Casilla {i + 1} → {s.kind === "project" ? s.project.name : s.title}
+                {t.square} {i + 1} → {s.kind === "project" ? s.project.name : s.title}
               </button>
             </li>
           ))}
@@ -293,8 +296,8 @@ function Detail({ square, index, squares, onGo }: { square: Square; index: numbe
 const cardClass =
   "relative rounded-3xl border-2 border-glow/70 bg-linear-to-br from-[#5d3366] via-wine to-[#2b1631] p-6 text-paper shadow-[0_0_40px_-10px_var(--color-glow)] md:p-8";
 
-export default function ExperienceBoard({ jobs }: { jobs: Job[] }) {
-  const squares = buildSquares(jobs);
+export default function ExperienceBoard({ jobs, t }: { jobs: Job[]; t: T }) {
+  const squares = buildSquares(jobs, t);
   const [geo] = useState(() => ({ wide: geometry(WIDE, squares.length), narrow: geometry(NARROW, squares.length) }));
   const tile = (i: number) => (i + 0.5) / squares.length; // posición de la casilla, de 0 a 1 del camino
   const [selected, setSelected] = useState(0);
@@ -340,8 +343,8 @@ export default function ExperienceBoard({ jobs }: { jobs: Job[] }) {
     // Escritorio: tablero y carta en fila. Celular y tablet: la carta va abajo del tablero.
     <div className="flex flex-col items-stretch gap-8 lg:flex-row lg:items-start">
       <div className="mx-auto w-full max-w-md shrink-0 rounded-[2rem] border-4 border-glow bg-[#1d2470] p-4 shadow-[0_0_0_6px_#432548,0_0_60px_-10px_var(--color-glow)] md:p-6 lg:mx-0 lg:w-[32rem] lg:max-w-none">
-        <Board geo={geo.narrow} squares={squares} selected={selected} pawnDist={pawn * geo.narrow.total} onSelect={select} className="[--pawn-x:2.9rem] min-[360px]:[--pawn-x:3.4rem] lg:hidden" labelClass="w-20 text-[11px] min-[360px]:w-24 min-[360px]:text-[13px]" />
-        <Board geo={geo.wide} squares={squares} selected={selected} pawnDist={pawn * geo.wide.total} onSelect={select} className="[--pawn-x:4.5rem] max-lg:hidden" labelClass="w-32 text-[15px]" />
+        <Board geo={geo.narrow} squares={squares} selected={selected} pawnDist={pawn * geo.narrow.total} onSelect={select} label={t.square} className="[--pawn-x:2.9rem] min-[360px]:[--pawn-x:3.4rem] lg:hidden" labelClass="w-20 text-[11px] min-[360px]:w-24 min-[360px]:text-[13px]" />
+        <Board geo={geo.wide} squares={squares} selected={selected} pawnDist={pawn * geo.wide.total} onSelect={select} label={t.square} className="[--pawn-x:4.5rem] max-lg:hidden" labelClass="w-32 text-[15px]" />
       </div>
 
       {/* La carta del detalle: al costado en escritorio (acompaña el scroll), abajo en celular y tablet */}
@@ -351,7 +354,7 @@ export default function ExperienceBoard({ jobs }: { jobs: Job[] }) {
         aria-live="polite"
       >
         <div key={selected} className="relative motion-safe:animate-cta-in">
-          <Detail square={squares[selected]} index={selected} squares={squares} onGo={select} />
+          <Detail square={squares[selected]} index={selected} squares={squares} onGo={select} t={t} />
         </div>
       </aside>
     </div>

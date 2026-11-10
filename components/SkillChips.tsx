@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import type { UI } from "@/data/ui";
 
 // Skills como fichas de póker: cada grupo es un color de ficha, con los tonos de la página.
 // `ink` = texto oscuro (para las fichas claras).
@@ -79,8 +80,8 @@ function Stack({ count, chip }: { count: number; chip: Chip }) {
   );
 }
 
-export default function SkillChips({ groups, soft }: { groups: { group: string; items: string[] }[]; soft: string[] }) {
-  const all = [...groups.map((g, i) => ({ ...g, chip: CHIPS[i % CHIPS.length] })), { group: "Habilidades blandas", items: soft, chip: SOFT }];
+export default function SkillChips({ groups, soft, t }: { groups: { group: string; items: string[] }[]; soft: string[]; t: UI["skills"] }) {
+  const all = [...groups.map((g, i) => ({ ...g, chip: CHIPS[i % CHIPS.length] })), { group: t.soft, items: soft, chip: SOFT }];
 
   return (
     <div className="space-y-10">
@@ -90,7 +91,7 @@ export default function SkillChips({ groups, soft }: { groups: { group: string; 
             <Stack count={g.items.length} chip={g.chip} />
             {g.group}
             <span className="mb-0.5 text-xs font-semibold text-muted">
-              {g.items.length} fichas
+              {g.items.length} {t.chips}
             </span>
           </h3>
           <ul className="mt-4 flex flex-wrap gap-2 sm:gap-3">

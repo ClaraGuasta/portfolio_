@@ -49,10 +49,10 @@ export function FactFace({ card }: { card: ProfileCard }) {
   );
 }
 
-export function JokerFace({ photo, name }: { photo: string; name: string }) {
+export function JokerFace({ photo, name, photoOf = "Foto de" }: { photo: string; name: string; photoOf?: string }) {
   return (
     <div className={`${faceClass} bg-wine shadow-[0_0_40px_-2px_var(--color-glow)]`}>
-      <Image src={photo} alt={`Foto de ${name}`} width={480} height={640} loading="eager" sizes="288px" className="size-full origin-[50%_35%] scale-125 object-cover" />
+      <Image src={photo} alt={`${photoOf} ${name}`} width={480} height={640} loading="eager" sizes="288px" className="size-full origin-[50%_35%] scale-125 object-cover" />
       <div className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-wine to-transparent" />
       <div className="absolute inset-2 rounded-xl border-2 border-glow" />
       <Star className="absolute right-4 top-4 size-6 text-white drop-shadow-[0_0_4px_var(--color-glow)]" />
