@@ -7,6 +7,7 @@ const montserrat = Montserrat({ subsets: ["latin"], variable: "--font-montserrat
 export const metadata: Metadata = {
   title: "Clara Guastavino | Portfolio",
   description: "Portfolio de Clara Guastavino: experiencia, educación, idiomas y tecnologías.",
+  metadataBase: new URL({process.env.SITE_URL}),
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

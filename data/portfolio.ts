@@ -3,7 +3,7 @@
 export const profile = {
   name: "Clara Matilde Guastavino",
   shortName: "Clara Guastavino",
-  role: "Desarrolladora Frontend Semi Senior",
+  role: "Ssr Frontend Developer",
   tagline: "React, Next.js y TypeScript, con foco en la experiencia de usuario y en el trabajo en equipo.",
   about: [
     "Soy desarrolladora frontend de Gualeguaychú, Entre Ríos. Trabajo con React, Next.js, TypeScript y Tailwind CSS en equipos multidisciplinarios, junto a ingenieros backend y product owners, construyendo plataformas para usuarios finales.",
@@ -11,13 +11,31 @@ export const profile = {
   ],
   location: "Gualeguaychú, Entre Ríos, Argentina",
   email: "cmguastavino@hotmail.com",
-  photo: "/clara.jpg",
-  cvUrl: "/ClaraGuastavinoCV.pdf", // actualizá este PDF en /public (el actual dice "Digital House – Actualidad")
+  photo: "/clara.jpeg",
+  cvUrl: "/ClaraGuastavinoCV.pdf",
   links: {
     github: "https://github.com/ClaraGuasta",
     linkedin: "https://www.linkedin.com/in/clara-guastavino-a6a94330a/",
   },
 };
+
+// Cartas del mazo de la presentación, en el orden en que salen. La última siempre es el comodín con la foto.
+export type ProfileCard = { title: string; text: string; pinned?: boolean }; // pinned: sale en todas las manos
+
+// Cartas del inicio: datos cortos y visuales (el detalle está en las secciones de abajo y en LinkedIn).
+// Es un mazo: en cada mezcla salen las cartas fijas (pinned) y el comodín con la foto, y el resto se completa al azar.
+// Los años se calculan desde el primer trabajo (mayo de 2022), así que se actualizan solos en cada build.
+const yearsCoding = Math.floor((Date.now() - new Date(2022, 4, 1).getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+
+export const heroFacts: ProfileCard[] = [
+  { title: `+${yearsCoding} años`, text: "de experiencia en desarrollo frontend", pinned: true },
+  { title: "React", text: "Next.js · TypeScript · Tailwind CSS" },
+  { title: "Inglés B2", text: "Cambridge First Certificate" },
+  { title: "Argentina", text: "Gualeguaychú, Entre Ríos" },
+  { title: "Testing", text: "Jest · React Testing Library" },
+  { title: "Node.js", text: "BFF con Express, Zod y Redis" },
+  { title: "Estudiante", text: "Analista en Sistemas · Universidad de Palermo" },
+];
 
 // `zoom` recorta el margen de la imagen para que el logo se lea en tamaño chico.
 export type Logo = { src: string; zoom: number };
@@ -30,6 +48,7 @@ const logos = {
 
 export type Project = {
   name: string;
+  short?: string; // nombre corto para la casilla del tablero
   stack: string[];
   bullets: string[];
 };
@@ -59,6 +78,7 @@ export const jobs: Job[] = [
     projects: [
       {
         name: "Storefront de e-commerce multi-zona",
+        short: "Storefront",
         stack: ["Next.js", "React", "TypeScript", "Tailwind CSS", "Zustand", "Algolia", "pnpm"],
         bullets: [
           "Migración de los contenidos de la home (ads, brands, heros, banners, productos, categorías y sugerencias de búsqueda) desde Promotionals al Marketing BFF.",
@@ -70,6 +90,7 @@ export const jobs: Job[] = [
       },
       {
         name: "Super Admin: backoffice del marketplace",
+        short: "Super Admin",
         stack: ["Next.js", "React", "TypeScript", "Material UI", "React Hook Form", "Jest"],
         bullets: [
           "Módulo de colecciones dinámicas de punta a punta: CRUD, formulario multi-tab, reglas (curada, dinámica o por filtros), preview de la PLP con la Search API y publicación.",
@@ -80,6 +101,7 @@ export const jobs: Job[] = [
       },
       {
         name: "BFF del marketplace",
+        short: "BFF",
         stack: ["Node.js", "TypeScript", "Express", "Zod", "OpenAPI", "MongoDB", "Redis", "AWS AppConfig"],
         bullets: [
           "Endpoints que orquestan microservicios (PIM, DAM, Marketing, carritos, órdenes y pagos) para el frontend y el backoffice.",
@@ -114,7 +136,8 @@ export type Study = {
   title: string;
   degree?: string;
   period: string;
-  current?: boolean; // muestra la pill "Cursando"
+  current?: boolean; // misión en curso (si no, figura como cumplida)
+  progress?: number; // ✏️ opcional, de 0 a 1: avance de la carrera en curso (por ejemplo 0.6 = 60 %)
   contentsLabel: string;
   contents: string[];
 };
@@ -127,6 +150,7 @@ export const studies: Study[] = [
     degree: "Tecnicatura de grado",
     period: "Agosto 2023 – Actualidad",
     current: true,
+    progress: 0.7, // ✏️ avance de la carrera: ajustalo al real
     contentsLabel: "Materias destacadas",
     contents: [
       "Estructura de Datos y Algoritmos",
@@ -161,9 +185,36 @@ export const studies: Study[] = [
   },
 ];
 
-export const languages = [
-  { name: "Español", level: "Nativo", detail: "" },
-  { name: "Inglés", level: "Professional Working", detail: "B2 · Cambridge First Certificate" },
+// Idiomas como cartas coleccionables. ✏️ `lore`: la descripción de la carta.
+// `cert`: certificación (la carta lleva acabado holográfico y sello). `icon`: runa del arte de la carta.
+export type Language = {
+  code: string;
+  name: string;
+  level: string;
+  rarity: string;
+  lore: string;
+  cert?: string;
+  icon: "voice" | "scroll";
+};
+
+export const languages: Language[] = [
+  {
+    code: "ES",
+    name: "Español",
+    level: "Nativo",
+    rarity: "Épico · Nativo",
+    lore: "Canal de voz principal de la party. Comunicación fluida, natural y sin latencia en el día a día.",
+    icon: "voice",
+  },
+  {
+    code: "EN",
+    name: "Inglés",
+    level: "Avanzado",
+    rarity: "Avanzado · Certificado",
+    lore: "Buff activo de lectura de documentación técnica, análisis de repositorios globales y colaboración internacional sin fricción.",
+    cert: "Cambridge First Certificate · B2",
+    icon: "scroll",
+  },
 ];
 
 export const skills: { group: string; items: string[] }[] = [
@@ -171,16 +222,16 @@ export const skills: { group: string; items: string[] }[] = [
   { group: "Estado y datos", items: ["Zustand", "Redux", "Zod", "GraphQL", "Axios", "React Hook Form"] },
   { group: "Backend", items: ["Node.js", "Express", "MongoDB", "Redis", "OpenAPI"] },
   { group: "Testing y calidad", items: ["Jest", "React Testing Library", "Sentry", "SonarQube", "ESLint", "New Relic"] },
-  { group: "Herramientas y metodologías", items: ["Git", "Docker", "pnpm", "Nginx", "Prismic", "Algolia", "Scrum"] },
+  { group: "Herramientas y metodologías", items: ["Git", "Docker", "pnpm", "Nginx", "Prismic", "Algolia", "Vercel", "Nullplatform", "Scrum"] },
 ];
 
 export const softSkills = [
   "Trabajo en equipo",
   "Creatividad",
   "Liderazgo",
-  "Capacidad de organización",
+  "Organización",
   "Versatilidad",
-  "Predisposición",
+  "Interés",
 ];
 
 // ---------- Recomendaciones de LinkedIn ----------
@@ -190,6 +241,8 @@ export type Recommendation = {
   initials: string;
   role: string;
   relation: string;
+  time?: string;
+  highlight: string; // frase textual de la cita, la que va grande en la reseña
   quote: string[];
 };
 
@@ -199,9 +252,13 @@ export const recommendations: Recommendation[] = [
     initials: "JM",
     role: "Engineering Manager",
     relation: "Me supervisó directamente",
+    time: "2025 – Actualidad",
+    highlight: "Clari superó ampliamente lo que se espera de su seniority.",
     quote: [
       "Tuve el placer de trabajar con Clara Guastavino (Clari) en el equipo de Growth de itti, donde se desempeñó como desarrolladora semi senior de frontend y BFF.",
-      "Clari superó ampliamente lo que se espera de su seniority. Lo que más la distingue es que no duda en aprender cosas nuevas: cada desafío lo toma como una oportunidad para crecer, incluso cuando eso implica salir de su zona de confort y meterse con otros lenguajes y otras partes del sistema. […]",
+      "Clari superó ampliamente lo que se espera de su seniority. Lo que más la distingue es que no duda en aprender cosas nuevas: cada desafío lo toma como una oportunidad para crecer, incluso cuando eso implica salir de su zona de confort y meterse con otros lenguajes y otras partes del sistema. Esa curiosidad y esa capacidad de adaptarse la llevaron a aportar mucho más allá de su rol.",
+      "Además del crecimiento técnico, Clari tiene una actitud que suma al equipo: es comprometida, se hace cargo de lo que encara y siempre está dispuesta a dar una mano.",
+      "Cualquier equipo que la sume gana a una profesional con muchísimo potencial, que aprende rápido y que no le tiene miedo a ningún desafío. La recomiendo sin dudarlo.",
     ],
   },
   {
@@ -209,6 +266,8 @@ export const recommendations: Recommendation[] = [
     initials: "JG",
     role: "Sr Software Engineer",
     relation: "Trabajamos en el mismo equipo",
+    time: "2025 – Actualidad",
+    highlight: "Es de esas personas que hacen que trabajar en conjunto sea mucho más ameno",
     quote: [
       "Pude trabajar muy de cerca con Clara en distintas iniciativas del equipo, y siempre fue un gusto compartir esos desafíos con ella.",
       "Uno de los trabajos que recuerdo especialmente fue la hackathon en la que nos propusimos experimentar y aprender más sobre SDD utilizando Spec-kitti. A partir de esa experiencia pudimos sacar adelante varias iniciativas para el servicio de Marketing, que hoy nos permiten trabajar con colecciones dinámicas, layouts dinámicos y otras funcionalidades. En todo ese proceso, ella tuvo un papel importante trabajando tanto en el BFF como en el administrador.",
@@ -221,6 +280,8 @@ export const recommendations: Recommendation[] = [
     initials: "LJ",
     role: "Senior Software Engineer",
     relation: "Me supervisó directamente",
+    time: "2022 – 2025",
+    highlight: "Es sin duda una de las mejores personas que tuve bajo mi liderazgo",
     quote: [
       "Tuve el placer de liderar a Clari desde sus inicios como trainee hasta convertirse en una profesional totalmente autónoma y resolutiva. Fue impresionante ver cómo creció, adoptando y aplicando rápidamente estándares y buenas prácticas. Clari siempre veló por la calidad y mantenibilidad de nuestros proyectos.",
       "Más allá de sus habilidades técnicas, Clari fue una excelente compañera, siempre dispuesta a dar una mano a los demás. Además, mostró un gran ownership sobre sus tickets, asegurando que cada tarea llegara a buen puerto. Posee una gran capacidad para aprender, una notable proactividad y un fuerte compromiso en todo lo que hizo.",
@@ -231,22 +292,22 @@ export const recommendations: Recommendation[] = [
 
 // ---------- Fuera del código ----------
 export const personal = {
-  title: "Fuera del código",
+  title: "Out Of Context",
   intro:
     "Cuando no estoy programando, probablemente tenga un libro en la mano o a alguna de mis mascotas encima del teclado. Estas son algunas pruebas.",
-  likes: [
-    { label: "Leo mucho", text: "Fantasía, ciencia ficción, romance, suspenso, terror, novelas, la lista puede seguir indefinidamente..." },
-    { label: "Me encantan los animales", text: "Mis favoritos: gatos, perros, pajaritos, osos, tigres, lobos, zorros, sapos, ratas... " },
-  ],
 };
 
-// ✏️ Frases "fuera de contexto". `wide: true` = foto horizontal.
-export const outOfContext: { src: string; alt: string; caption: string; wide?: boolean }[] = [
-  { src: "/004.jpeg", alt: "Clara trabajando con Duki", caption: "Daily. Asistencia perfecta, cero aportes.", wide: true },
+// ✏️ Frases "fuera de contexto": una carta por cara del dado (más el comodín, que se agrega en OutOfContext).
+// Todas las fotos van horizontales (3:2).
+export const outOfContext: { src: string; alt: string; caption: string }[] = [
+  { src: "/004.jpeg", alt: "Clara trabajando con Duki", caption: "Daily. Asistencia perfecta, cero aportes." },
   { src: "/005.jpeg", alt: "Clara trabajando con Kira", caption: "Dependencia crítica: no se puede desinstalar." },
   { src: "/001.jpeg", alt: "Clara trabajando con Pipa", caption: "Entrevista técnica: me pidió que explique qué hace este código." },
   { src: "/007.jpeg", alt: "Clara trabajando con Kira 3", caption: "Code review con cariño: aprobado." },
   { src: "/006.jpeg", alt: "Clara trabajando con Kira 2", caption: "Revisando el tablero del sprint. Opina que hay demasiado rojo." },
-  { src: "/008.jpeg", alt: "Clara trabajando con Nube", caption: "Pair programming: yo codeo, mi compañera duerme.", wide: true },
-  { src: "/003.jpeg", alt: "Clara trabajando con su gato naranja en el brazo", caption: "Reunión con mi manager. Llegó sin avisar y se quedó.", wide: true },
+  { src: "/008.jpeg", alt: "Clara trabajando con Nube", caption: "Pair programming: yo codeo, mi compañera duerme." },
+  { src: "/003.jpeg", alt: "Clara trabajando con Duki", caption: "Reunión con mi manager. Llegó sin avisar y se quedó." },
+  { src: "/009.jpeg", alt: "Clara con Sapo", caption: "Encontré un bug. Era verde y saltaba." },
+  { src: "/002.jpeg", alt: "Clara leyendo", caption: "Documentación leída de punta a punta. Con post-its incluidos y todo." },
+  { src: "/010.jpeg", alt: "Clara tomando mate", caption: "Los mates no pueden faltar cuando se hace buen código"},
 ];

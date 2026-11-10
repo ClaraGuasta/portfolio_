@@ -1,19 +1,56 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { Star } from "@/components/CardBack";
 
+// El contrato de misión: quien me recluta completa los parámetros y "despliega" la misión.
 type Status = "idle" | "sending" | "sent" | "error";
 
 const fieldClass =
-  "mt-2 w-full rounded-lg border border-line bg-white px-4 py-3 placeholder:text-muted/70";
+  "mt-2 w-full rounded-lg border border-glow/30 bg-[#140a1a]/60 px-4 py-3 text-paper placeholder:text-paper/35 transition-[border-color,box-shadow,background-color] hover:border-glow/50 focus:border-glow focus:bg-[#1b0e22]/80 focus:shadow-[0_0_0_3px_rgb(233_168_220/.15),0_0_22px_-4px_var(--color-glow)] focus:outline-none!";
+// (el "!" le gana al contorno verde global de :focus-visible: acá el foco es el brillo neón del borde)
 
-function Label({ htmlFor, children }: { htmlFor: string; children: React.ReactNode }) {
+function Field({ id, label, hint, children }: { id: string; label: string; hint: string; children: React.ReactNode }) {
   return (
-    <label htmlFor={htmlFor} className="text-sm font-semibold">
-      {children} <span className="text-wine" aria-hidden>*</span>
-    </label>
+    <div>
+      <label htmlFor={id} className="flex items-baseline justify-between gap-3">
+        <span className="font-display text-xs font-bold uppercase tracking-[.15em] text-paper/85">
+          {label} <span className="text-glow" aria-hidden>*</span>
+        </span>
+        <span className="hidden text-[11px] text-paper/45 sm:inline">{hint}</span>
+      </label>
+      {children}
+    </div>
   );
 }
+
+// Pergamino con una señal saliendo: "enviar la misión"
+function ScrollSignal({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden>
+      <path d="M5 4h10.5v12.5a2.5 2.5 0 0 1-2.5 2.5H4.5A2.5 2.5 0 0 0 7 16.5V5.5A1.5 1.5 0 0 0 5.5 4Z" fill="currentColor" fillOpacity=".15" />
+      <path d="M5.5 4A1.5 1.5 0 0 0 4 5.5V7h3M9.5 8.5h3M9.5 11.5h3M2 16.5h5" />
+      <path d="M18.5 7.5a4 4 0 0 1 0 5M20.5 5.5a7 7 0 0 1 0 9" />
+    </svg>
+  );
+}
+
+// Esquinas ornamentadas del contrato
+function Corner({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={`absolute size-6 text-glow/70 ${className}`} aria-hidden>
+      <path d="M2 14V2h12M2 7h5V2" />
+      <circle cx="7" cy="7" r="1.2" fill="currentColor" />
+    </svg>
+  );
+}
+
+// Estrellas que salen disparadas cuando se acepta la misión
+const BURST = Array.from({ length: 12 }, (_, i) => {
+  const angle = (i / 12) * Math.PI * 2;
+  const dist = 170 + (i % 3) * 45;
+  return { x: Math.round(Math.cos(angle) * dist), y: Math.round(Math.sin(angle) * dist), delay: (i % 4) * 60 };
+});
 
 export default function ContactForm({ email }: { email: string }) {
   const [status, setStatus] = useState<Status>("idle");
@@ -23,7 +60,7 @@ export default function ContactForm({ email }: { email: string }) {
     const form = event.currentTarget;
     const data = new FormData(form);
     data.append("access_key", process.env.NEXT_PUBLIC_WEB3FORMS_KEY ?? "");
-    data.append("subject", "Nuevo mensaje desde tu portfolio");
+    data.append("subject", "Nuevo encargo desde tu portfolio");
 
     setStatus("sending");
     try {
@@ -42,40 +79,112 @@ export default function ContactForm({ email }: { email: string }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5 rounded-2xl border border-line bg-white/60 p-6 md:p-8">
-      <div>
-        <Label htmlFor="contact-name">Nombre</Label>
-        <input id="contact-name" name="name" type="text" required autoComplete="name" placeholder="Ingresá tu nombre..." className={fieldClass} />
-      </div>
-      <div>
-        <Label htmlFor="contact-email">Email</Label>
-        <input id="contact-email" name="email" type="email" required autoComplete="email" placeholder="Ingresá tu email..." className={fieldClass} />
-      </div>
-      <div>
-        <Label htmlFor="contact-message">Mensaje</Label>
-        <textarea id="contact-message" name="message" required rows={5} placeholder="Ingresá tu mensaje..." className={`${fieldClass} resize-y`} />
-      </div>
+    // Marco del contrato: borde con degradé rosa, como las cartas
+    <div className="rounded-2xl bg-linear-to-br from-[#ffaae9]/80 via-[#d966ba]/40 to-[#803575]/70 p-px shadow-[0_0_40px_-12px_var(--color-glow)]">
+      <div className="relative overflow-hidden rounded-[calc(1rem-1px)] bg-linear-to-b from-[#2f1636]/90 via-[#1e0e25]/90 to-[#150a1c]/95 backdrop-blur-sm">
+        <Corner className="left-3 top-3" />
+        <Corner className="right-3 top-3 -scale-x-100" />
+        <Corner className="bottom-3 left-3 -scale-y-100" />
+        <Corner className="bottom-3 right-3 -scale-100" />
 
-      {/* Trampa para bots: una persona nunca ve ni marca este campo */}
-      <input type="checkbox" name="botcheck" className="hidden" tabIndex={-1} autoComplete="off" />
-
-      <button
-        type="submit"
-        disabled={status === "sending"}
-        className="w-full rounded-full bg-wine px-6 py-3.5 font-semibold text-paper hover:opacity-90 disabled:cursor-wait disabled:opacity-60"
-      >
-        {status === "sending" ? "Enviando..." : "Enviar"}
-      </button>
-
-      <div aria-live="polite" className="text-sm empty:hidden">
-        {status === "sent" && <p>¡Gracias! Recibí tu mensaje y te respondo lo antes posible.</p>}
-        {status === "error" && (
-          <p>
-            No se pudo enviar el mensaje. Probá de nuevo o escribime a{" "}
-            <a href={`mailto:${email}`} className="font-semibold underline underline-offset-2">{email}</a>.
+        {/* Cabecera del contrato */}
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-dashed border-glow/30 px-10 py-5">
+          <p className="font-display text-sm font-extrabold uppercase tracking-[.2em] text-paper">Contrato de misión</p>
+          <p className="flex items-center gap-2 rounded-full border border-accent/50 px-3 py-1 font-display text-[11px] font-bold uppercase tracking-wider text-accent">
+            <span className="size-1.5 rounded-full bg-accent" aria-hidden />
+            {status === "sent" ? "Misión aceptada" : "Vacante abierta"}
           </p>
+        </div>
+
+        {status === "sent" ? (
+          <div className="relative grid min-h-[26rem] place-items-center p-8 text-center" role="status">
+            <div className="pointer-events-none absolute left-1/2 top-1/2" aria-hidden>
+              {BURST.map((b, i) => (
+                <Star
+                  key={i}
+                  className="absolute size-5 text-glow opacity-0 motion-safe:animate-[star-burst_1.2s_ease-out_both] motion-reduce:hidden"
+                  style={{ "--x": `${b.x}px`, "--y": `${b.y}px`, animationDelay: `${b.delay}ms` } as React.CSSProperties}
+                />
+              ))}
+            </div>
+            <div className="relative">
+              <p className="font-display text-sm font-bold uppercase tracking-[.3em] text-accent">Señal recibida</p>
+              <p className="mt-2 font-display text-3xl font-extrabold text-paper drop-shadow-[0_0_14px_var(--color-glow)] md:text-4xl">
+                ¡Misión desplegada!
+              </p>
+              <p className="mx-auto mt-4 max-w-xs text-paper/80">Recibí tu encargo y te respondo lo antes posible.</p>
+              <button
+                type="button"
+                onClick={() => setStatus("idle")}
+                className="mt-8 font-display text-sm font-bold uppercase tracking-wider text-glow underline decoration-2 underline-offset-4"
+              >
+                Publicar otro encargo
+              </button>
+            </div>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-6 px-6 py-8 md:px-10 md:py-10">
+            <div className="grid gap-6 md:grid-cols-2">
+              <Field id="contact-name" label="Emisor / Reclutador" hint="Quién encarga">
+                <input id="contact-name" name="name" type="text" required autoComplete="name" placeholder="Guild Master / Tu nombre" className={fieldClass} />
+              </Field>
+              <Field id="contact-email" label="Canal de respuesta" hint="Tu email">
+                <input
+                  id="contact-email"
+                  name="email"
+                  type="email"
+                  required
+                  autoComplete="email"
+                  placeholder="canal_de_contacto@realm.com"
+                  className={fieldClass}
+                />
+              </Field>
+            </div>
+            <Field id="contact-message" label="Detalles de la misión" hint="Propuesta, proyecto o saludo">
+              <textarea
+                id="contact-message"
+                name="message"
+                required
+                rows={6}
+                placeholder="Describí la propuesta, proyecto o saludo..."
+                className={`${fieldClass} min-h-40 resize-y`}
+              />
+            </Field>
+
+            {/* Trampa para bots: una persona nunca ve ni marca este campo */}
+            <input type="checkbox" name="botcheck" className="hidden" tabIndex={-1} autoComplete="off" />
+
+            <div className="flex flex-col-reverse items-stretch gap-4 border-t border-dashed border-glow/25 pt-6 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-xs text-paper/50">
+                <span className="text-glow">*</span> Parámetros obligatorios del contrato
+              </p>
+              <button
+                type="submit"
+                disabled={status === "sending"}
+                className="group flex items-center justify-center gap-3 rounded-lg border border-glow/80 bg-[#2a1630] px-6 py-3.5 font-display text-sm font-extrabold uppercase tracking-wider text-paper shadow-[0_0_18px_-4px_var(--color-glow)] transition-[background-color,box-shadow,translate] hover:-translate-y-0.5 hover:bg-[#3a1d42] hover:shadow-[0_0_30px_-2px_var(--color-glow)] disabled:cursor-wait disabled:opacity-80"
+              >
+                <ScrollSignal
+                  className={`size-5 text-glow transition-transform duration-300 group-hover:rotate-[-8deg] ${status === "sending" ? "motion-safe:animate-pulse" : ""}`}
+                />
+                {status === "sending" ? "Transmitiendo señal…" : "Aceptar encargo y enviar"}
+              </button>
+            </div>
+
+            <div aria-live="polite" className="text-sm empty:hidden">
+              {status === "error" && (
+                <p className="rounded-lg border border-glow/40 bg-glow/10 px-4 py-3">
+                  <span className="font-display font-bold uppercase tracking-wider text-glow">Señal perdida.</span> No se pudo enviar el encargo. Probá de
+                  nuevo o escribime a{" "}
+                  <a href={`mailto:${email}`} className="font-semibold underline underline-offset-2">
+                    {email}
+                  </a>
+                  .
+                </p>
+              )}
+            </div>
+          </form>
         )}
       </div>
-    </form>
+    </div>
   );
 }

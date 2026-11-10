@@ -4,15 +4,70 @@
   /* Paleta: #B3C7F8 #A3B16F #432548 */
   --color-paper: #f6f7fd;   /* fondo: lavanda muy clara */
   --color-ink: #1c2340;     /* texto: azul noche */
-  --color-muted: #5a6086;   /* texto secundario */
-  --color-line: #d9ddf3;    /* bordes */
+  --color-muted: #aab3e0;   /* texto secundario (sobre el fondo oscuro) */
+  --color-line: rgb(255 255 255 / .16); /* bordes */
   --color-accent: #A3B16F;  /* verde: botón principal, fondo de la foto, foco */
   --color-marker: #b3c7f8;  /* celeste: resaltado del título y recuadros */
   --color-wine: #432548;    /* ciruela: línea de tiempo, skills, botón de enviar */
+  --color-glow: #e9a8dc;    /* rosa: brillo de las cartas */
   --font-display: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
-  /* Tira del carrusel: la duración la calcula RecommendationsCarousel según el largo del texto */
-  --animate-slide-timer: slide-timer linear forwards;
+  /* Mazo: la carta vuela desde el mazo hasta su lugar mientras se da vuelta. El comodín gira una vuelta más. */
+  --animate-card-fly: card-fly .9s cubic-bezier(.2,.8,.2,1) backwards;
+  --animate-card-flip: card-flip .9s cubic-bezier(.2,.8,.2,1) backwards;
+  --animate-card-flip-joker: card-flip-joker 1.4s cubic-bezier(.2,.8,.2,1) backwards;
+
+  @keyframes card-fly {
+    from {
+      transform: translate(calc(-1 * var(--fan-x) - var(--i) * var(--step)), calc(-1 * var(--fan-y))) scale(var(--deal-scale));
+    }
+  }
+  @keyframes card-flip {
+    from { transform: rotateY(-180deg); }
+  }
+  @keyframes card-flip-joker {
+    from { transform: rotateY(-900deg) scale(.8); }
+  }
+
+  /* Inicio: las cartas entran deslizándose desde la izquierda hasta quedar en fila; después flotan */
+  --animate-hero-slide-in: hero-slide-in 1s cubic-bezier(.2,.85,.25,1.08) backwards;
+  --animate-hero-float: hero-float 5s ease-in-out infinite;
+  --animate-twinkle: twinkle 3s ease-in-out infinite;
+
+  @keyframes hero-slide-in {
+    0% { transform: translateX(-110vw) rotate(-18deg); opacity: 0; filter: blur(4px) brightness(1.8); }
+    30% { opacity: 1; }
+    100% { filter: blur(0) brightness(1); }
+  }
+  @keyframes hero-float {
+    50% { translate: 0 -20px; }
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 1; scale: 1; }
+    50% { opacity: .35; scale: .7; }
+  }
+
+  /* Botones-carta del inicio: se dan vuelta solos al cargar (components/HeroCta) */
+  --animate-cta-in: cta-in .5s ease-out backwards;
+
+  @keyframes cta-in {
+    from { opacity: 0; translate: 0 1.5rem; }
+  }
+
+  /* Carta que sale con el dado: se da vuelta al aparecer */
+  --animate-card-reveal: card-reveal .6s cubic-bezier(.3,1.4,.5,1) backwards;
+
+  @keyframes card-reveal {
+    from { transform: perspective(900px) rotateY(-90deg) scale(.9); opacity: 0; }
+  }
+
+  /* Idiomas: brillo holográfico que cruza la carta certificada (components/LanguageCards) */
+  --animate-foil: foil 5s ease-in-out infinite;
+
+  @keyframes foil {
+    0%, 55% { background-position: 150% 0; }
+    100% { background-position: -50% 0; }
+  }
 
   @keyframes slide-timer {
     from { transform: scaleX(0); }
@@ -26,9 +81,89 @@ html {
 }
 
 body {
-  background: var(--color-paper);
-  color: var(--color-ink);
+  background: #0a0d2c;
+  color: var(--color-paper);
   font-family: var(--font-sans);
+}
+
+/* Cielo nocturno de todo el sitio (components/StarField, fijo detrás del contenido) */
+.site-sky {
+  background:
+    radial-gradient(ellipse 80% 60% at 80% 10%, rgb(67 37 72 / .55), transparent 70%),
+    linear-gradient(#0a0d2c, #161b5e 55%, #0a0d2c);
+}
+
+/* Inicio: resplandor detrás de las cartas. Celular: fila deslizable. Desde tablet: las 5 a la vista. */
+.hero-sky {
+  background: radial-gradient(ellipse 60% 50% at 50% 62%, rgb(143 163 242 / .9) 0%, rgb(74 88 200 / .6) 40%, transparent 75%);
+}
+.hero-row {
+  container-type: inline-size;
+}
+.hero-cards {
+  --gap: 1rem;
+  --card-w: 10rem;
+  display: flex;
+  gap: var(--gap);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  /* aire para el brillo y la flotación; la primera y la última carta pueden quedar centradas */
+  padding: 4rem calc(50% - var(--card-w) / 2);
+  margin-block: -1.5rem;
+}
+.hero-card {
+  position: relative;
+  flex: none;
+  width: var(--card-w);
+  /* el alto lo da CARD_RATIO en components/HeroCards.tsx (lo usan la carta y su dorso) */
+  scroll-snap-align: center;
+  font-size: calc(var(--card-w) / 10); /* el contenido de la carta mide en em y escala con ella */
+}
+@media (min-width: 48rem) {
+  .hero-cards {
+    --gap: 1.25rem;
+    --card-w: min(12rem, (100cqw - 4 * var(--gap)) / 5);
+    justify-content: center;
+    overflow: visible;
+    padding-inline: 0;
+  }
+}
+
+/* Mesa del mazo (components/CardDeck, reservado para otra sección). Celular: mazo chico arriba y abanico abajo. Desde tablet: mazo a la izquierda y abanico a la derecha. */
+.card-deck {
+  width: var(--deck-w);
+  aspect-ratio: 3 / 4;
+}
+.card-hint {
+  left: calc(var(--deck-w) + 1.25rem);
+  top: 0;
+  right: 0;
+}
+.card-slot {
+  width: var(--card-w);
+  height: var(--card-h);
+  transform: translate(calc(var(--fan-x) + var(--i) * var(--step)), var(--fan-y)) rotate(var(--tilt, calc((var(--i) - 2) * 1.5deg)));
+}
+
+@media (min-width: 48rem) {
+  .card-table {
+    --card-w: 14rem;
+    --deck-w: var(--card-w);
+    --fan-x: calc(var(--card-w) + 2rem);
+    --fan-y: 0rem;
+    --deal-scale: 1;
+    --step: min(5.5rem, calc((100cqw - 2 * var(--card-w) - 2.5rem) / 4));
+    height: calc(var(--card-h) + 3.5rem);
+  }
+  .card-hint {
+    left: 0;
+    top: calc(var(--card-h) + 1rem);
+    width: 100%;
+  }
+}
+@media (min-width: 64rem) {
+  .card-table { --card-w: 16rem; }
 }
 
 :focus-visible {
@@ -39,3 +174,12 @@ body {
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 }
+
+/* Tablero de encargos (components/ContactForm): estrellas al aceptar la misión */
+@keyframes star-burst {
+  from { translate: 0 0; scale: .2; opacity: 0; }
+  25% { opacity: 1; }
+  to { translate: var(--x) var(--y); scale: 1.2; opacity: 0; }
+}
+
+/* Logros de Educación (components/AchievementDeck): cada logro aparece como si se desbloqueara */
