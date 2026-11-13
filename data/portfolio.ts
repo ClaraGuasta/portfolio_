@@ -4,7 +4,7 @@
 export const profile = {
   name: "Clara Matilde Guastavino",
   shortName: "Clara Guastavino",
-  role: "Ssr Frontend Developer",
+  role: "Senior Frontend Developer",
   tagline: "React, Next.js y TypeScript, con foco en la experiencia de usuario y en el trabajo en equipo.",
   about: [
     "Soy desarrolladora frontend de Gualeguaychú, Entre Ríos. Trabajo con React, Next.js, TypeScript y Tailwind CSS en equipos multidisciplinarios, junto a ingenieros backend y product owners, construyendo plataformas para usuarios finales.",
@@ -70,18 +70,21 @@ export const jobs: Job[] = [
   {
     company: "itti",
     logo: logos.itti,
-    role: "Semi Senior Software Engineer",
+    role: "Senior Software Engineer",
     place: "Argentina",
     period: "Septiembre 2025 – Actualidad",
     summary:
-      "Trabajo en la plataforma de e-commerce de un marketplace, tanto en frontend como en el BFF que conecta los servicios. Estos son los tres proyectos en los que participo:",
-    description: [],
+      "Entré como Semi Senior en septiembre de 2025 y desde mayo de 2026 soy Senior. Trabajo en la plataforma de e-commerce de un marketplace, tanto en frontend como en el BFF que conecta los servicios, con liderazgo técnico del storefront. Estos son los tres proyectos en los que participo:",
+    description: [
+      "Calidad y estándares: definición de cobertura de tests unitarios y de integración con Jest y Testing Library, monitoreo en producción con New Relic, SonarQube y code reviews entre equipos.",
+    ],
     projects: [
       {
         name: "Storefront de e-commerce multi-zona",
         short: "Storefront",
         stack: ["Next.js", "React", "TypeScript", "Tailwind CSS", "Zustand", "Algolia", "pnpm"],
         bullets: [
+          "Liderazgo técnico de la plataforma en producción: arquitectura multi-zona con deploy independiente por zona, feature flags y optimización de Core Web Vitals.",
           "Migración de los contenidos de la home (ads, brands, heros, banners, productos, categorías y sugerencias de búsqueda) desde Promotionals al Marketing BFF.",
           "Paginación de APIs (page/skip y cursor) con helpers compartidos en un package del monorepo.",
           "Flujos de conversión: buy now, add to cart, redirect post-login y auth guards entre zonas.",
@@ -94,7 +97,7 @@ export const jobs: Job[] = [
         short: "Super Admin",
         stack: ["Next.js", "React", "TypeScript", "Material UI", "React Hook Form", "Jest"],
         bullets: [
-          "Módulo de colecciones dinámicas de punta a punta: CRUD, formulario multi-tab, reglas (curada, dinámica o por filtros), preview de la PLP con la Search API y publicación.",
+          "Diseño de arquitectura e implementación de punta a punta del módulo de colecciones dinámicas (más de 40 componentes reutilizables, custom hooks y servicios): CRUD, formulario multi-tab, reglas (curada, dinámica o por filtros), preview de la PLP con la Search API y publicación.",
           "Constructor de condiciones de filtros apoyado en los facets del índice, con preview estilo tienda.",
           "Import masivo por CSV o pegado (ids, slugs y URLs de tienda), resolviendo vía PIM, con concurrencia y manejo de errores y reintentos.",
           "Aportes en placements, integración con DAM, switches de canal, borrado de colecciones y banners, y mejoras de cobertura de tests.",
@@ -105,8 +108,8 @@ export const jobs: Job[] = [
         short: "BFF",
         stack: ["Node.js", "TypeScript", "Express", "Zod", "OpenAPI", "MongoDB", "Redis", "AWS AppConfig"],
         bullets: [
-          "Endpoints que orquestan microservicios (PIM, DAM, Marketing, carritos, órdenes y pagos) para el frontend y el backoffice.",
-          "Migración gradual del contenido promocional desde MongoDB al microservicio de Marketing, con APIs legacy y nuevas en paralelo, sin romper a los consumidores.",
+          "Diseño, implementación y consumo de endpoints que orquestan microservicios (PIM, DAM, Marketing, carritos, órdenes y pagos) para el frontend y el backoffice.",
+          "Migración gradual del contenido promocional desde MongoDB al microservicio de Marketing, con dual-running de APIs legacy y nuevas, sin romper a los consumidores y reduciendo latencia.",
           "Contratos de API con Zod y documentación OpenAPI/Swagger.",
           "Cache con Redis, logging con Pino, observabilidad con New Relic y feature flags con AWS AppConfig.",
         ],

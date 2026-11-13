@@ -37,18 +37,21 @@ export const jobs: Job[] = [
   {
     company: "itti",
     logo: logos.itti,
-    role: "Semi Senior Software Engineer",
+    role: "Senior Software Engineer",
     place: "Argentina",
     period: "September 2025 – Present",
     summary:
-      "I work on a marketplace's e-commerce platform, both on the frontend and on the BFF that connects the services. These are the three projects I'm part of:",
-    description: [],
+      "I joined as a Semi Senior in September 2025 and have been a Senior since May 2026. I work on a marketplace's e-commerce platform, both on the frontend and on the BFF that connects the services, and I'm the technical lead for the storefront. These are the three projects I'm part of:",
+    description: [
+      "Quality and standards: defined unit and integration test coverage with Jest and Testing Library, production monitoring with New Relic, SonarQube, and cross-team code reviews.",
+    ],
     projects: [
       {
         name: "Multi-zone e-commerce storefront",
         short: "Storefront",
         stack: ["Next.js", "React", "TypeScript", "Tailwind CSS", "Zustand", "Algolia", "pnpm"],
         bullets: [
+          "Technical lead of the production platform: multi-zone architecture with independent deploys per zone, feature flags and Core Web Vitals optimization.",
           "Migrated the home page content (ads, brands, heroes, banners, products, categories and search suggestions) from Promotionals to the Marketing BFF.",
           "API pagination (page/skip and cursor) with shared helpers in a monorepo package.",
           "Conversion flows: buy now, add to cart, post-login redirect and auth guards across zones.",
@@ -61,7 +64,7 @@ export const jobs: Job[] = [
         short: "Super Admin",
         stack: ["Next.js", "React", "TypeScript", "Material UI", "React Hook Form", "Jest"],
         bullets: [
-          "End-to-end dynamic collections module: CRUD, multi-tab form, rules (curated, dynamic or filter-based), PLP preview with the Search API, and publishing.",
+          "Architecture design and end-to-end implementation of the dynamic collections module (40+ reusable components, custom hooks and services): CRUD, multi-tab form, rules (curated, dynamic or filter-based), PLP preview with the Search API, and publishing.",
           "Filter condition builder backed by the index facets, with a store-like preview.",
           "Bulk import via CSV or paste (ids, slugs and store URLs), resolved through the PIM, with concurrency, error handling and retries.",
           "Contributions to placements, DAM integration, channel switches, collection and banner deletion, and test coverage improvements.",
@@ -72,8 +75,8 @@ export const jobs: Job[] = [
         short: "BFF",
         stack: ["Node.js", "TypeScript", "Express", "Zod", "OpenAPI", "MongoDB", "Redis", "AWS AppConfig"],
         bullets: [
-          "Endpoints that orchestrate microservices (PIM, DAM, Marketing, carts, orders and payments) for the frontend and the back office.",
-          "Gradual migration of promotional content from MongoDB to the Marketing microservice, running legacy and new APIs in parallel without breaking consumers.",
+          "Designed, built and consumed endpoints that orchestrate microservices (PIM, DAM, Marketing, carts, orders and payments) for the frontend and the back office.",
+          "Gradual migration of promotional content from MongoDB to the Marketing microservice, dual-running legacy and new APIs without breaking consumers while reducing latency.",
           "API contracts with Zod and OpenAPI/Swagger documentation.",
           "Caching with Redis, logging with Pino, observability with New Relic and feature flags with AWS AppConfig.",
         ],
